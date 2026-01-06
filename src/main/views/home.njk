@@ -1,121 +1,108 @@
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
 {% extends "template.njk" %}
 
-<!-- You may want to make further use of these components: https://design-system.service.gov.uk/components/
-but ultimately it is up to you -->
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block pageTitle %}Home - Task Management{% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-xl">Welcome to your dev test!</h1>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
-  <!-- The freedom is yours. You can design the solution however you like, however there is a starting point provided
-  to ensure you have both services running. You may want to make use of the Gov UK Components:
-  https://design-system.service.gov.uk/components/ to add tabs and so forth :) -->
+    <h1 class="govuk-heading-xl">Task Management Service</h1>
 
-  {% if example.id %}
+    <p class="govuk-body-l">
+      A simple task management application to help you organise and track your work.
+    </p>
 
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: {
-            text: "ID"
-          },
-          value: {
-            text: example.id
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case id ?!"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Case Number"
-          },
-          value: {
-            text: example.caseNumber
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case number"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Title"
-          },
-          value: {
-            html: example.title
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case title"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Description"
-          },
-          value: {
-            html: example.description
-          },
-          actions: {
-            items: [
-               {
-                 href: "#",
-                 text: "Delete",
-                 visuallyHiddenText: "Delete description"
-               },
-               {
-                 href: "#",
-                 text: "Change",
-                 visuallyHiddenText: "Change description"
-               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Status"
-          },
-          value: {
-            html: example.status
-          },
-          actions: {
-            items: [
-            ]
-          }
-        },
-        {
-          key: {
-           text: "Created Date"
-          },
-          value: {
-           html: example.createdDate
-          },
-          actions: {
-           items: [
-           ]
-          }
-        }
-      ]
+    {{ govukInsetText({
+      text: "Use this service to create, view, edit and manage tasks with different priorities and statuses."
     }) }}
 
-  {% endif %}
+    <h2 class="govuk-heading-m">What you can do</h2>
 
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Create new tasks with title, description, due date and priority</li>
+      <li>View all tasks in a filterable list</li>
+      <li>Filter tasks by status (Pending, In Progress, Completed, Cancelled)</li>
+      <li>Filter tasks by priority (Low, Medium, High, Urgent)</li>
+      <li>Update task status with quick actions</li>
+      <li>Edit task details</li>
+      <li>Delete tasks you no longer need</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Get started</h2>
+
+    <p class="govuk-body">
+      View your existing tasks or create a new one to get started.
+    </p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View all tasks",
+        href: "/tasks",
+        isStartButton: true
+      }) }}
+
+      {{ govukButton({
+        text: "Create a new task",
+        href: "/tasks/create",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    {% if backendError %}
+      {{ govukWarningText({
+        text: "The backend API is currently unavailable. Some features may not work.",
+        iconFallbackText: "Warning"
+      }) }}
+    {% endif %}
+
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <aside class="govuk-!-margin-top-6">
+      <h2 class="govuk-heading-s">Task statuses</h2>
+      <ul class="govuk-list govuk-list--spaced">
+        <li>
+          <strong class="govuk-tag govuk-tag--grey">Pending</strong>
+          <br><span class="govuk-body-s">Tasks waiting to be started</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--blue">In Progress</strong>
+          <br><span class="govuk-body-s">Tasks currently being worked on</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--green">Completed</strong>
+          <br><span class="govuk-body-s">Tasks that have been finished</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--red">Cancelled</strong>
+          <br><span class="govuk-body-s">Tasks that have been cancelled</span>
+        </li>
+      </ul>
+
+      <h2 class="govuk-heading-s govuk-!-margin-top-6">Priority levels</h2>
+      <ul class="govuk-list govuk-list--spaced">
+        <li>
+          <strong class="govuk-tag govuk-tag--grey">Low</strong>
+          <br><span class="govuk-body-s">Can be done when time permits</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--yellow">Medium</strong>
+          <br><span class="govuk-body-s">Should be done soon</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--orange">High</strong>
+          <br><span class="govuk-body-s">Needs attention soon</span>
+        </li>
+        <li>
+          <strong class="govuk-tag govuk-tag--red">Urgent</strong>
+          <br><span class="govuk-body-s">Needs immediate attention</span>
+        </li>
+      </ul>
+    </aside>
+  </div>
+</div>
 {% endblock %}

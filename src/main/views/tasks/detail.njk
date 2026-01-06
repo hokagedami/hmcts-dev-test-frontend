@@ -1,0 +1,142 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block pageTitle %}{{ task.title }} - Task Management{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back to tasks",
+    href: "/tasks"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if success == 'updated' %}
+      {{ govukNotificationBanner({
+        type: "success",
+        text: "Task updated successfully."
+      }) }}
+    {% elif success == 'status-updated' %}
+      {{ govukNotificationBanner({
+        type: "success",
+        text: "Task status updated successfully."
+      }) }}
+    {% endif %}
+
+    {% if error == 'status-update-failed' %}
+      {{ govukNotificationBanner({
+        text: "Failed to update task status. Please try again."
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-xl">{{ task.title }}</h1>
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Status" },
+          value: {
+            html: govukTag({
+              text: task.statusDisplay,
+              classes: task.statusTagColor
+            })
+          }
+        },
+        {
+          key: { text: "Priority" },
+          value: {
+            html: govukTag({
+              text: task.priorityDisplay,
+              classes: task.priorityTagColor
+            })
+          }
+        },
+        {
+          key: { text: "Description" },
+          value: { text: task.description or "No description provided" }
+        },
+        {
+          key: { text: "Due Date" },
+          value: { text: task.formattedDueDate }
+        },
+        {
+          key: { text: "Created" },
+          value: { text: task.formattedCreatedAt }
+        },
+        {
+          key: { text: "Last Updated" },
+          value: { text: task.formattedUpdatedAt }
+        }
+      ]
+    }) }}
+
+    <div class="govuk-button-group govuk-!-margin-top-6">
+      {{ govukButton({
+        text: "Edit task",
+        href: "/tasks/" + task.id + "/edit"
+      }) }}
+
+      {{ govukButton({
+        text: "Delete task",
+        href: "/tasks/" + task.id + "/delete",
+        classes: "govuk-button--warning"
+      }) }}
+    </div>
+
+    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+    <h2 class="govuk-heading-m">Quick status update</h2>
+
+    <div class="govuk-button-group">
+      {% if task.status != 'PENDING' %}
+        <form method="post" action="/tasks/{{ task.id }}/status" style="display: inline; margin: 0; padding: 0;">
+          <input type="hidden" name="status" value="PENDING">
+          {{ govukButton({
+            text: "Mark as Pending",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-0"
+          }) }}
+        </form>
+      {% endif %}
+
+      {% if task.status != 'IN_PROGRESS' %}
+        <form method="post" action="/tasks/{{ task.id }}/status" style="display: inline; margin: 0; padding: 0;">
+          <input type="hidden" name="status" value="IN_PROGRESS">
+          {{ govukButton({
+            text: "Start Task",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-0"
+          }) }}
+        </form>
+      {% endif %}
+
+      {% if task.status != 'COMPLETED' %}
+        <form method="post" action="/tasks/{{ task.id }}/status" style="display: inline; margin: 0; padding: 0;">
+          <input type="hidden" name="status" value="COMPLETED">
+          {{ govukButton({
+            text: "Mark Complete",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-0"
+          }) }}
+        </form>
+      {% endif %}
+
+      {% if task.status != 'CANCELLED' %}
+        <form method="post" action="/tasks/{{ task.id }}/status" style="display: inline; margin: 0; padding: 0;">
+          <input type="hidden" name="status" value="CANCELLED">
+          {{ govukButton({
+            text: "Cancel Task",
+            classes: "govuk-button--warning govuk-!-margin-bottom-0"
+          }) }}
+        </form>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

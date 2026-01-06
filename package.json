@@ -6,18 +6,21 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "NODE_ENV=production ts-node -r tsconfig-paths/register src/main/server.ts",
+    "start": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/main/server.ts",
     "start:dev": "nodemon --config nodemon.json",
+    "start:test": "ts-node src/main/server.ts",
     "lint": "stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",
     "lint:fix": "prettier --write . .github && eslint --fix .",
-    "build": "yarn webpack --config webpack.config.js",
-    "build:prod": "NODE_ENV=production yarn webpack --mode production --config webpack.config.js",
-    "test": "npx if-env CI=true && exit 0 || yarn test:unit",
+    "build": "webpack --config webpack.config.js",
+    "build:prod": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.js",
+    "test": "npm run test:unit && npm run test:routes",
+    "test:all": "npm run test:unit && npm run test:routes && npm run test:e2e",
     "test:unit": "jest",
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.js",
-    "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps",
-    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
+    "test:functional": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps",
+    "test:e2e": "node scripts/run-e2e.js",
+    "cichecks": "npm install && npm run build && npm rebuild puppeteer && npm run lint && npm run test && npm run test:a11y",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -44,7 +47,7 @@
     "csurf": "^1.11.0",
     "express": "^4.18.2",
     "express-nunjucks": "^3.1.1",
-    "glob": "^10.3.3",
+    "glob": "11.1.0",
     "govuk-frontend": "4.8.0",
     "jquery": "^3.7.0",
     "lodash": "^4.17.21",
@@ -66,17 +69,20 @@
     "@codeceptjs/allure-legacy": "^1.0.2",
     "@codeceptjs/configure": "^1.0.1",
     "@types/chai-as-promised": "^7.1.5",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.10",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "axios-debug-log": "^1.0.0",
+    "axios-mock-adapter": "^2.1.0",
     "babel-loader": "^9.1.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^8.0.0",
     "chokidar": "^3.6.0",
     "codeceptjs": "^3.5.3",
     "copy-webpack-plugin": "9.1.0",
+    "cross-env": "^10.1.0",
     "css-loader": "^7.0.0",
     "debug": "^4.3.4",
     "eslint": "^8.46.0",
@@ -93,7 +99,6 @@
     "nodemon": "^3.0.0",
     "playwright": "^1.36.2",
     "prettier": "^3.0.0",
-    "request": "^2.88.2",
     "sass": "^1.65.1",
     "sass-loader": "^14.0.0",
     "sinon": "^18.0.0",
@@ -107,14 +112,12 @@
     "webpack-dev-middleware": "^7.0.0",
     "webpack-node-externals": "^3.0.0"
   },
-  "resolutions": {
+  "overrides": {
     "@opentelemetry/instrumentation": "0.52.0",
-    "semver": "^7.5.2",
-    "axios": ">1.6.0"
+    "semver": "^7.5.2"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
-  },
-  "packageManager": "yarn@3.8.2"
+  }
 }

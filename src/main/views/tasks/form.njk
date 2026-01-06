@@ -1,0 +1,121 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block pageTitle %}{% if isEdit %}Edit Task{% else %}Create Task{% endif %} - Task Management{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/tasks" if not isEdit else "/tasks/" + task.id
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if error %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: error,
+            href: "#title"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-xl">{% if isEdit %}Edit Task{% else %}Create Task{% endif %}</h1>
+
+    <form method="post" action="{% if isEdit %}/tasks/{{ task.id }}/edit{% else %}/tasks/create{% endif %}">
+
+      {{ govukInput({
+        label: {
+          text: "Title",
+          classes: "govuk-label--m"
+        },
+        id: "title",
+        name: "title",
+        value: task.title if task else "",
+        errorMessage: { text: error } if error and "Title" in error else undefined
+      }) }}
+
+      {{ govukTextarea({
+        label: {
+          text: "Description",
+          classes: "govuk-label--m"
+        },
+        id: "description",
+        name: "description",
+        value: task.description if task else "",
+        hint: {
+          text: "Provide details about this task"
+        }
+      }) }}
+
+      {{ govukInput({
+        label: {
+          text: "Due Date and Time",
+          classes: "govuk-label--m"
+        },
+        id: "dueDateTime",
+        name: "dueDateTime",
+        type: "datetime-local",
+        value: task.dueDateTimeForInput if task and task.dueDateTimeForInput else (task.dueDateTime if task else ""),
+        hint: {
+          text: "When should this task be completed by?"
+        }
+      }) }}
+
+      {{ govukSelect({
+        id: "priority",
+        name: "priority",
+        label: {
+          text: "Priority",
+          classes: "govuk-label--m"
+        },
+        items: [
+          { value: "LOW", text: "Low", selected: task.priority == "LOW" if task else false },
+          { value: "MEDIUM", text: "Medium", selected: (task.priority == "MEDIUM" if task else true) },
+          { value: "HIGH", text: "High", selected: task.priority == "HIGH" if task else false },
+          { value: "URGENT", text: "Urgent", selected: task.priority == "URGENT" if task else false }
+        ]
+      }) }}
+
+      {% if isEdit %}
+        {{ govukSelect({
+          id: "status",
+          name: "status",
+          label: {
+            text: "Status",
+            classes: "govuk-label--m"
+          },
+          items: [
+            { value: "PENDING", text: "Pending", selected: task.status == "PENDING" if task else true },
+            { value: "IN_PROGRESS", text: "In Progress", selected: task.status == "IN_PROGRESS" if task else false },
+            { value: "COMPLETED", text: "Completed", selected: task.status == "COMPLETED" if task else false },
+            { value: "CANCELLED", text: "Cancelled", selected: task.status == "CANCELLED" if task else false }
+          ]
+        }) }}
+      {% endif %}
+
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Update task" if isEdit else "Create task"
+        }) }}
+
+        <a class="govuk-link" href="{% if isEdit %}/tasks/{{ task.id }}{% else %}/tasks{% endif %}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

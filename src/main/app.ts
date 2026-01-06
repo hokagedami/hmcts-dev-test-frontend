@@ -1,15 +1,15 @@
 import * as path from 'path';
 
-import { HTTPError } from './HttpError';
-import { Nunjucks } from './modules/nunjucks';
-
 import * as bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
-const { setupDev } = require('./development');
+import { HTTPError } from './HttpError';
+import { setupDev } from './development';
+import { Nunjucks } from './modules/nunjucks';
+import homeRoutes from './routes/home';
+import tasksRoutes from './routes/tasks';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -29,10 +29,9 @@ app.use((req, res, next) => {
   next();
 });
 
-glob
-  .sync(__dirname + '/routes/**/*.+(ts|js)')
-  .map(filename => require(filename))
-  .forEach(route => route.default(app));
+// Register routes
+homeRoutes(app);
+tasksRoutes(app);
 
 setupDev(app, developmentMode);
 
